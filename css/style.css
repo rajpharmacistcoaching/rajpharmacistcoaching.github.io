@@ -140,7 +140,11 @@ ul,ol{
 	Logo
 \*------------------------------------*/
 .navbar-brand {
-    padding: 0;
+	padding: 0;
+	float:	left;
+	height: 50px;
+	font-size: 18px;
+	line-height: 20px;
 }
 
 .navbar-brand .logo {
@@ -256,9 +260,22 @@ ul,ol{
 	padding: 0;
 	height: 40px;
 	width: 40px;
-	margin-top: 5px;
+	margin-top: 10px;
 	z-index:99;
+
+	float: right;
+	margin-right: 30px;
+	margin-bottom: 8px;
+	background-color: transparent;
+	background-image: none;
+	border: 1px solid transparent;
+	border-radius: 4px;
+
 }
+.navbar-toggle:focus {
+	outline: 0;
+}
+
 
 .navbar-toggle > span {
 	position: absolute;
@@ -282,9 +299,9 @@ ul,ol{
 }
 
 .navbar-toggle > span , .navbar-toggle > span:before , .navbar-toggle > span:after {
-	height: 2px;
-	width: 25px;
-	background-color:#374050;
+	height: 4px;
+    width: 25px;
+    background-color: #ff6700;
 }
 
 .navbar-toggle > span:before {
@@ -310,6 +327,19 @@ ul,ol{
         -ms-transform: translateY(-10px) rotate(-45deg);
             transform: translateY(-10px) rotate(-45deg);
 }
+
+.navbar-nav>li>a {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    line-height: 20px;
+}
+
+.nav>li>a {
+    position: relative;
+    /* display: block; */
+    padding: 10px 15px;
+}
+
 
 /*------------------------------------*\
 	Hero Area
