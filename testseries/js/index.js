@@ -12,8 +12,7 @@ firebase.initializeApp(firebaseConfig);
 var db = firebase.firestore();
 
 
-var globalData = {'papers':{}}
-globalData.papers.latest = questionPaper //demo paper
+var globalData = {'papers':{}, 'siteName':'pharmacist'}
 globalData.papers.demo = questionPaper
 
 
@@ -24,7 +23,7 @@ firebase.auth().onAuthStateChanged(function(user) {
   if (user) {
     globalData.user = user
     console.log('Logged In :',user.uid);
-    setTemplate('viewTemplate','dashboardPage')
+    getOldExamList();
   } else {
     console.log('User not logged in');
     setTemplate('viewTemplate','loginPage')
@@ -36,12 +35,11 @@ firebase.auth().onAuthStateChanged(function(user) {
 function doLogin(){
   loading('show');
   console.log('Logging In');
-  var em = document.getElementById("inputEmail").value+'@pharmacist.com';
+  var em = document.getElementById("inputEmail").value+'@'+globalData.siteName+'.com';
   var pas = document.getElementById("inputPassword").value;
   firebase.auth().signInWithEmailAndPassword(em, pas)
   .then(function(k){
     console.log("LogIn successful, rediecting to HomePage");
-    loading('hide')
   })
   .catch(function(error) {
     console.log(error);
@@ -53,7 +51,7 @@ function doLogout(){
   loading('show')
   console.log('logOut');
   firebase.auth().signOut().then(function() {
-    globalData = {'papers':{}}
+    globalData = {'papers':{}, 'siteName':'pharmacist'}
     globalData.papers.latest = questionPaper //demo paper
     globalData.papers.demo = questionPaper
 
@@ -77,15 +75,11 @@ function goDashboard(){
 }
 
 
-
-
-
-
-
-
-
-
-
+function getLatestExam() {
+  // latest exam button function
+  var latestExamId = Object.keys(globalData.oldExamJson).sort(function(a, b){return b-a})[0]
+  getExamPaperById(latestExamId)
+}
 
 
 function getExamPaperById(examId) {
@@ -105,15 +99,18 @@ function getExamPaperById(examId) {
       console.log("Fetched data from cache.");
 
     }else{
-      var docRef = db.collection("pharmacist").doc(examId);
+      var docRef = db.collection(globalData.siteName).doc(examId);
       docRef.get().then(function(doc) {
         if (doc.exists) {
           var quesJson = JSON.parse(doc.data().ques)
           globalData.papers[examId] = quesJson;
           globalData.answerSheet = setAnswerSheet(globalData.papers[examId])
-          setPapertoHomePage()
           console.log("Got data successfully.");
-        } else { console.log("No such document!"); }
+        } else {
+          globalData.answerSheet = setAnswerSheet(globalData.papers.demo)
+          console.log("No such document!");
+        }
+        setPapertoHomePage()
         loading('hide');
 
       }).catch(function(error) {
@@ -142,18 +139,6 @@ function setPapertoHomePage() {
 };
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 function oldExamFun(){
   loading('show');
 
@@ -166,9 +151,10 @@ function oldExamFun(){
         loading('hide');
         console.log("Fetched data from cache.");
       }else{
-        var docRef = db.collection("pharmacist").doc("oldExamList");
+        var docRef = db.collection(globalData.siteName).doc("oldExamList");
         docRef.get().then(function(doc) {
           if (doc.exists) {
+            console.log(doc.data().oldExamList);
             var oldExamList = JSON.parse(doc.data().oldExamList)
             globalData.oldExamJson = oldExamList;
             console.log(oldExamList);
@@ -209,20 +195,18 @@ function startOldPaper() {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+function getOldExamList() {
+  var docRef = db.collection(globalData.siteName).doc("oldExamList");
+  docRef.get().then(function(doc) {
+    if (doc.exists) {
+      var oldExamList = JSON.parse(doc.data().oldExamList)
+      globalData.oldExamJson = oldExamList;
+      setTemplate('viewTemplate','dashboardPage')
+      console.log("Got data successfully.");
+    }
+    loading('hide');
+  })
+}
 
 
 
@@ -383,10 +367,10 @@ function closePopUp() {
   var modal = document.getElementById("myModal");
   modal.style.display = "none";
 }
-window.onclick = function(event) {
-  var modal = document.getElementById("myModal");
-  if (event.target == modal) { closePopUp() }
- }
+// window.onclick = function(event) {
+//   var modal = document.getElementById("myModal");
+//   if (event.target == modal) { closePopUp() }
+//  }
 
 function loading(showHide) {
   if(showHide=='show'){
