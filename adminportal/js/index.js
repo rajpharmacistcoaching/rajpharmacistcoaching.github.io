@@ -179,7 +179,7 @@ function createDelList() {
   var elm2 = document.getElementById('oldExamList')
   var tempHtml = ''
   for (each of Object.keys(globalData.oldExamList).sort(function(a, b){return b-a})){
-    tempHtml += '<option id="'+each+'">'+globalData.oldExamList[each]["name"]+' : '+globalData.oldExamList[each]["dateTime"]+'</option>'
+    tempHtml += '<option id="'+each+'">'+globalData.oldExamList[each]["name"]+'</option>'
   }
   elm2.innerHTML = tempHtml
 }
