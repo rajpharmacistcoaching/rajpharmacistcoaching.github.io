@@ -182,8 +182,8 @@ function oldExamFun(){
 
 function oldExamPaperHTML(oldExamJson) {
   var tempHtml = ''
-  for (each of Object.keys(oldExamJson)){
-    tempHtml += '<option id="'+each+'">'+oldExamJson[each]["name"]+' : '+oldExamJson[each]["dateTime"]+'</option>'
+  for (each of Object.keys(oldExamJson).sort(function(a, b){return b-a})){
+    tempHtml += '<option id="'+each+'">'+oldExamJson[each]["name"]+'</option>'
   }
   return tempHtml
 }
