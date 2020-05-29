@@ -14,10 +14,23 @@ var db = firebase.firestore();
 
 var globalData = {'papers':{}, 'siteName':'pharmacist'}
 globalData.papers.demo = questionPaper
-
+var randomSessionString = randomString(20, '#aA')
 
 
 console.log(globalData.user);
+function setListner() {
+  db.collection("users").doc(globalData.user.uid)
+  .onSnapshot(function(doc) {
+    // console.log("Current data: ", doc.data());
+    var ll = doc.data()
+    // console.log(ll.sessionHash != randomSessionString,ll.sessionHash , randomSessionString);
+    if(ll.sessionHash != randomSessionString){
+      console.log('logout due to missing authString');
+      doLogout()
+    }
+  });
+}
+
 
 firebase.auth().onAuthStateChanged(function(user) {
   if (user) {
@@ -40,6 +53,14 @@ function doLogin(){
   firebase.auth().signInWithEmailAndPassword(em, pas)
   .then(function(k){
     console.log("LogIn successful, rediecting to HomePage");
+    db.doc('users/'+k.uid).set({
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      sessionHash: randomSessionString
+    })
+    .then(function(){ setListner(); console.log('Session Hash updated successful');})
+    .catch(function(error) { console.log(error); });
+
+
   })
   .catch(function(error) {
     console.log(error);
@@ -382,4 +403,16 @@ function loading(showHide) {
     closePopUp()
   }
 
+}
+
+
+
+function randomString(length, chars) {
+    var mask = '';
+    if (chars.indexOf('a') > -1) mask += 'abcdefghjkmnpqrstuvwxyz';
+    if (chars.indexOf('A') > -1) mask += 'ABCDEFGHJKMNPQRSTUVWXYZ';
+    if (chars.indexOf('#') > -1) mask += '23456789';
+    var result = '';
+    for (var i = length; i > 0; --i) result += mask[Math.floor(Math.random() * mask.length)];
+    return result;
 }
